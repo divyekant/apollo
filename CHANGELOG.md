@@ -1,15 +1,18 @@
 # Changelog
 
-## Unreleased
+## [1.0.0] - 2026-02-28
 
 ### Added
 - `dev:` section in config for local development environment (runtime, services/ports, commands)
 - Onboarding questions for dev environment setup
 - `/apollo check` validates dev environment (duplicate ports, compose file existence)
 - Natural language support for adding dev config ("we use docker compose", "api on 3001")
+- Session start hook with project status one-liner
+- Multi-agent support (Cursor, Codex, Windsurf, Copilot, Aider)
+- OSS scaffolding (LICENSE, CONTRIBUTING, CODE_OF_CONDUCT)
 
 ### Fixed
-- Session start hook now prints a one-liner status to the terminal (via stderr)
+- Session start hook shows status only on first response of session
 
 ## [0.1.0] - 2026-02-27
 
