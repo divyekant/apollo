@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+- Session start hook now prints a one-liner status to the terminal (via stderr)
+
 ## [0.1.0] - 2026-02-27
 
 ### Added
