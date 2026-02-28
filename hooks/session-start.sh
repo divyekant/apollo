@@ -39,7 +39,7 @@ fi
 STATUS="Apollo: ${PROJECT} | ${EXTENDS} template | v${VERSION}${COMMITS_SINCE_TAG}${DRIFT}"
 
 # Build context + display instruction
-CONTEXT="DISPLAY THIS STATUS LINE at the very start of your first response, on its own line, as a dim/muted line using this exact format:\n\n\`${STATUS}\`\n\nDo not add commentary about it. Just print it and continue with your response."
+CONTEXT="DISPLAY THIS STATUS LINE only in your VERY FIRST response of the session (not on subsequent messages), on its own line, as a dim/muted line using this exact format:\n\n\`${STATUS}\`\n\nDo not add commentary about it. Just print it and continue with your response. After the first response, never show it again."
 
 # If drift detected, add silent fix instruction
 if [ -n "$DRIFT" ]; then
