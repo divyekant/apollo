@@ -139,7 +139,7 @@ Ask questions ONE AT A TIME using AskUserQuestion. Use multiple choice where pos
     - Parse into `dev.services` map with port as number
     - Optionally ask for descriptions: "Brief description for each? (or 'skip')"
 
-14. **Dev commands**
+14. **Dev commands** (only if runtime is not "skip")
     - "Start command?" — e.g., `docker compose up -d` or `npm start`
     - "Stop command? (or 'skip')" — e.g., `docker compose down`
     - "Test command? (or 'skip')" — e.g., `docker compose exec api npm test`
