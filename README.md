@@ -43,20 +43,30 @@ Three built-in templates:
 
 Create custom templates by adding YAML files to `~/.apollo/templates/`.
 
-## Agent Support
+## Multi-Agent Support
 
-Apollo's config format is agent-agnostic. The YAML files at `~/.apollo/` can be read by any agent.
+Apollo writes conventions to **all your coding agents simultaneously**. Configure which agents you use in `defaults.yaml`:
 
-Rule enforcement works by injecting a managed section into the agent's instruction file:
+```yaml
+agents:
+  - claude-code
+  - cursor
+  - codex
+  - copilot
+```
 
-| Agent | Instruction file |
-|-------|-----------------|
-| Claude Code | `CLAUDE.md` |
-| Cursor | `.cursorrules` |
-| Codex | `CODEX.md` |
-| Windsurf | `.windsurfrules` |
+On every injection (`/apollo init`, `/apollo check`, config update), Apollo writes to each agent's instruction file:
 
-Currently ships with a Claude Code skill adapter. Other adapters can be built using the same config format.
+| Agent | Instruction file | Format |
+|-------|-----------------|--------|
+| `claude-code` | `CLAUDE.md` | Markdown with managed section markers |
+| `cursor` | `.cursor/rules/apollo.mdc` | MDC frontmatter (Cursor rules format) |
+| `codex` | `AGENTS.md` | Markdown with managed section markers |
+| `windsurf` | `.windsurfrules` | Markdown with managed section markers |
+| `copilot` | `.github/copilot-instructions.md` | Markdown with managed section markers |
+| `aider` | `CONVENTIONS.md` | Markdown with managed section markers |
+
+Apollo manages only its own section (between `<!-- APOLLO:START -->` and `<!-- APOLLO:END -->` markers). Your own instructions in these files are left untouched. For Cursor, Apollo owns the entire `.cursor/rules/apollo.mdc` file but doesn't touch other rule files.
 
 ## License
 

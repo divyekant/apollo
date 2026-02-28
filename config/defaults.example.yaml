@@ -5,6 +5,16 @@
 # Where new projects are created
 projects_dir: ~/Projects
 
+# Which coding agents to target (Apollo writes instructions to all of them)
+# Each agent gets its own instruction file in the project
+agents:
+  - claude-code                   # CLAUDE.md
+  # - cursor                      # .cursor/rules/apollo.mdc
+  # - codex                       # AGENTS.md
+  # - windsurf                    # .windsurfrules
+  # - copilot                     # .github/copilot-instructions.md
+  # - aider                       # CONVENTIONS.md
+
 # Dev preferences
 stack:
   language: typescript          # Your primary language

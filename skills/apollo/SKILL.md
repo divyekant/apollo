@@ -213,13 +213,14 @@ Read config and repo state, output a status report. Non-conversational — just 
    - Is `~/.apollo/defaults.yaml` present?
    - Show: "Template: <name> | Config: <sources loaded>"
 
-2. **Instruction sync**
-   - Read the agent instruction file (CLAUDE.md / .cursorrules / etc.)
-   - Look for `<!-- APOLLO:START -->` markers
-   - Compare managed section content against current resolved config
-   - If in sync: `[OK] Agent instructions in sync with config`
-   - If out of sync: `[DRIFT] Agent instructions out of sync — run /apollo to re-inject`
-   - If no managed section: `[MISSING] No Apollo section in agent instructions`
+2. **Instruction sync** (check ALL configured agents)
+   - For each agent in the `agents` config list:
+     - Read that agent's instruction file (see Agent File Formats in Injection Procedure)
+     - Look for `<!-- APOLLO:START -->` markers (or check MDC content for Cursor)
+     - Compare managed section against current resolved config
+     - If in sync: `[OK] <agent> instructions in sync`
+     - If out of sync: `[DRIFT] <agent> instructions out of sync — run /apollo to re-inject`
+     - If file/section missing: `[MISSING] <agent> instruction file not found`
 
 3. **Git state**
    - Uncommitted changes: `[WARN] N uncommitted changes`
@@ -388,15 +389,15 @@ This procedure is called by `/apollo init`, `/apollo check` (when drift detected
 
 ### Steps:
 
-1. **Determine target file**
-   - If `.cursorrules` exists in project root → target is `.cursorrules`
-   - If `CODEX.md` exists in project root → target is `CODEX.md`
-   - If `.windsurfrules` exists in project root → target is `.windsurfrules`
-   - Default → target is `CLAUDE.md`
+1. **Determine target agents**
+
+   Read the `agents` list from resolved config. If not set, default to `[claude-code]`.
+
+   For EACH agent in the list, write to its instruction file using the agent-specific format below.
 
 2. **Resolve config** using three-tier resolution
 
-3. **Generate managed section** from resolved config. Translate each config value into a human-readable instruction:
+3. **Generate instructions** from resolved config. Translate each config value into a human-readable instruction:
 
    | Config | Instruction |
    |--------|------------|
@@ -423,21 +424,119 @@ This procedure is called by `/apollo init`, `/apollo check` (when drift detected
 
    Only include instructions for config values that are set and meaningful (skip nulls, empty arrays, false booleans that represent absence).
 
-4. **Write to target file**
+4. **Write to each agent's instruction file** using the format for that agent
 
-   Wrap the instructions in markers:
-   ```markdown
-   <!-- APOLLO:START - Do not edit this section manually -->
-   ## Project Conventions (managed by Apollo)
-   - <instruction 1>
-   - <instruction 2>
-   - ...
-   <!-- APOLLO:END -->
-   ```
+### Agent File Formats
 
-   - If target file exists and has markers: replace content between markers
-   - If target file exists but no markers: append managed section at end (with a blank line separator)
-   - If target file doesn't exist: create it with only the managed section
+#### claude-code → `CLAUDE.md`
+
+Markdown with HTML comment markers:
+
+```markdown
+<!-- APOLLO:START - Do not edit this section manually -->
+## Project Conventions (managed by Apollo)
+- <instruction 1>
+- <instruction 2>
+<!-- APOLLO:END -->
+```
+
+Write strategy:
+- If file exists and has markers: replace content between markers
+- If file exists but no markers: append managed section at end
+- If file doesn't exist: create with managed section only
+
+#### cursor → `.cursor/rules/apollo.mdc`
+
+Cursor uses MDC (Markdown Component) format in `.cursor/rules/`. Create the directory if needed.
+
+```markdown
+---
+description: Project conventions managed by Apollo
+globs:
+alwaysApply: true
+---
+
+# Project Conventions (managed by Apollo)
+
+- <instruction 1>
+- <instruction 2>
+```
+
+Write strategy:
+- Create `.cursor/rules/` directory if it doesn't exist
+- Always overwrite `.cursor/rules/apollo.mdc` entirely (Apollo owns this file)
+- Never touch other `.mdc` files in the directory
+
+#### codex → `AGENTS.md`
+
+OpenAI Codex reads `AGENTS.md` at project root. Same marker-based approach as CLAUDE.md:
+
+```markdown
+<!-- APOLLO:START - Do not edit this section manually -->
+## Project Conventions (managed by Apollo)
+- <instruction 1>
+- <instruction 2>
+<!-- APOLLO:END -->
+```
+
+Write strategy: same as claude-code (marker-based insert/replace/create).
+
+#### windsurf → `.windsurfrules`
+
+Plain markdown, marker-based:
+
+```markdown
+<!-- APOLLO:START - Do not edit this section manually -->
+## Project Conventions (managed by Apollo)
+- <instruction 1>
+- <instruction 2>
+<!-- APOLLO:END -->
+```
+
+Write strategy: same as claude-code (marker-based insert/replace/create).
+
+#### copilot → `.github/copilot-instructions.md`
+
+GitHub Copilot reads from `.github/copilot-instructions.md`. Create `.github/` if needed.
+
+```markdown
+<!-- APOLLO:START - Do not edit this section manually -->
+## Project Conventions (managed by Apollo)
+- <instruction 1>
+- <instruction 2>
+<!-- APOLLO:END -->
+```
+
+Write strategy:
+- Create `.github/` directory if it doesn't exist
+- Marker-based insert/replace/create (same as claude-code)
+
+#### aider → `CONVENTIONS.md`
+
+Aider reads `CONVENTIONS.md` at project root. Marker-based:
+
+```markdown
+<!-- APOLLO:START - Do not edit this section manually -->
+## Project Conventions (managed by Apollo)
+- <instruction 1>
+- <instruction 2>
+<!-- APOLLO:END -->
+```
+
+Write strategy: same as claude-code (marker-based insert/replace/create).
+
+### Multi-Agent Summary
+
+| Agent | File | Format | Owned by Apollo? |
+|-------|------|--------|-----------------|
+| `claude-code` | `CLAUDE.md` | Markdown, markers | Managed section only |
+| `cursor` | `.cursor/rules/apollo.mdc` | MDC frontmatter | Entire file |
+| `codex` | `AGENTS.md` | Markdown, markers | Managed section only |
+| `windsurf` | `.windsurfrules` | Markdown, markers | Managed section only |
+| `copilot` | `.github/copilot-instructions.md` | Markdown, markers | Managed section only |
+| `aider` | `CONVENTIONS.md` | Markdown, markers | Managed section only |
+
+Apollo writes to ALL configured agents on every injection. If an agent is removed from the config, its file is left as-is (no cleanup — user can delete manually).
 
 ---
 
