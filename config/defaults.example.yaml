@@ -1,0 +1,68 @@
+# Apollo Configuration — Global Defaults
+# Copy to ~/.apollo/defaults.yaml and customize
+# Or run /apollo config for interactive setup
+
+# Where new projects are created
+projects_dir: ~/Projects
+
+# Dev preferences
+stack:
+  language: typescript          # Your primary language
+  package_manager: bun          # npm | yarn | pnpm | bun | pip | cargo | go
+  test_framework: vitest        # vitest | jest | pytest | go-test | cargo-test | etc.
+
+# Git discipline
+git:
+  commit_style: conventional    # conventional | freeform
+  auto_commit: false            # If true, agent may commit without asking
+  branch_strategy: feature      # feature | trunk
+
+# Coding style
+code:
+  style: concise                # concise | verbose
+  comments: minimal             # minimal | thorough
+  error_handling: boundaries    # boundaries (validate at edges) | defensive (validate everywhere)
+
+# Documentation
+docs:
+  readme: true                  # Generate/maintain README
+  changelog: true               # Generate/maintain CHANGELOG.md
+  update_trigger: feature       # feature | release | manual — when to update docs
+
+# Testing
+testing:
+  code:
+    approach: tdd               # tdd | test-after | none
+    framework: vitest           # Should match stack.test_framework
+    coverage_target: null       # Number (e.g. 80) or null for no target
+    run_before_commit: true     # Enforce tests pass before committing
+  product:
+    tool: delphi                # delphi | manual | none
+    surfaces: [ui, api, cli]    # ui | api | cli | background
+    trigger: feature            # feature | release | manual
+
+# OSS structure (applied when template includes OSS)
+oss:
+  license: MIT                  # MIT | Apache-2.0 | GPL-3.0 | none
+  contributing: true            # Generate CONTRIBUTING.md
+  code_of_conduct: true         # Generate CODE_OF_CONDUCT.md
+  issue_templates: true         # Generate .github/ISSUE_TEMPLATE/
+
+# Skills / workflow preferences
+workflow:
+  design_before_code: true      # Always run brainstorming/design phase first
+  tdd: true                     # Use TDD approach for implementation
+  review_before_merge: true     # Code review before merging
+
+# Release & versioning
+release:
+  versioning: semver            # semver | calver | manual
+  changelog: auto               # auto (from commits) | manual | none
+  tag_on_release: true          # Create git tags (v1.2.3)
+  publish: false                # Auto-publish to registry (npm, pypi, etc.)
+
+# Secrets & env handling
+secrets:
+  env_pattern: ".env*"          # Glob pattern for env files to gitignore
+  extra_ignores: []             # Additional patterns to always gitignore
+  warn_on_commit: true          # Warn if secrets might be staged
