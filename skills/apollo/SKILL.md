@@ -49,6 +49,8 @@ Apollo uses three-tier config resolution. Later tiers override earlier ones.
 
 **Merge strategy:** Deep merge. Nested keys override individually, not entire objects. For example, if defaults has `stack.language: typescript` and `.apollo.yaml` has `stack.package_manager: pip`, the result is `stack.language: typescript` + `stack.package_manager: pip`.
 
+**Dev section merge:** `dev.runtime` overrides as a scalar. `dev.services` and `dev.commands` merge by key — project-level entries add to or override template/default entries (same deep-merge behavior as other sections).
+
 ---
 
 ## /apollo config — Conversational Onboarding
@@ -127,6 +129,23 @@ Ask questions ONE AT A TIME using AskUserQuestion. Use multiple choice where pos
     - "How do you version releases?"
     - Options: Semver (1.2.3), Calendar (2026.02), Manual
 
+12. **Dev runtime** (optional)
+    - "Does this project run locally or in containers?"
+    - Options: Local (bare process), Docker Compose, Docker, Podman, Skip for now
+    - If "Skip": omit `dev:` section entirely
+
+13. **Services** (only if runtime is not "local" and not "skip")
+    - "What services does it run? (name:port, comma-separated, or 'skip')"
+    - Parse into `dev.services` map with port as number
+    - Optionally ask for descriptions: "Brief description for each? (or 'skip')"
+
+14. **Dev commands** (only if runtime is not "skip")
+    - "Start command?" — e.g., `docker compose up -d` or `npm start`
+    - "Stop command? (or 'skip')" — e.g., `docker compose down`
+    - "Test command? (or 'skip')" — e.g., `docker compose exec api npm test`
+    - "Build command? (or 'skip')" — e.g., `docker compose build`
+    - "Any other commands? (name: command, or 'done')" — e.g., `logs: docker compose logs -f`
+
 ### After all questions:
 
 Assemble the answers into a valid `defaults.yaml` and write it to `~/.apollo/defaults.yaml`.
@@ -158,6 +177,11 @@ Create a new project with scaffolding based on Apollo config.
    - Show the resolved config (defaults + template) as a summary
    - "Any changes for this project, or use these defaults?"
    - If changes: ask which category, then which value
+
+   After override questions, if the resolved config does not yet have a `dev:` section:
+   - Ask the dev environment questions (same as onboarding questions 12-14 above)
+   - If user answers, merge into `.apollo.yaml` for this project
+   - If user skips, omit `dev:` from the project config
 
 4. **Ask about .apollo.yaml tracking**
    - "Should .apollo.yaml be committed to git (for team sharing) or gitignored (personal only)?"
@@ -240,7 +264,12 @@ Read config and repo state, output a status report. Non-conversational — just 
    - If `secrets.warn_on_commit: true`: check `git diff --cached --name-only` for files matching `secrets.env_pattern` or `secrets.extra_ignores`
    - If found: `[WARN] Staged file matches secrets pattern: <filename>`
 
-7. **Memories context** (optional)
+7. **Dev environment** (if `dev:` is present in resolved config)
+   - Check for duplicate ports across services: `[WARN] Duplicate port {port} in services: {name1}, {name2}`
+   - If `dev.runtime` is `docker-compose`: check if `docker-compose.yaml` or `compose.yaml` exists in project root. If not: `[WARN] Runtime is docker-compose but no compose file found`
+   - If all checks pass: `[OK] Dev: {runtime}, {N} services`
+
+8. **Memories context** (optional)
    - If Memories MCP tools are available, search for project-specific memories
    - Surface up to 3 relevant memories as `[MEMORY]` entries
 
@@ -257,6 +286,7 @@ Template: <name> | Config: <sources>
 [OK] Version: 0.2.0 (from .apollo.yaml)
 [INFO] 5 commits since v0.1.0
 [OK] No secrets in staged files
+[OK] Dev: docker-compose, 3 services (api:3001, frontend:5173, redis:6379)
 [MEMORY] "Tests need --forceExit flag" (2026-02-20)
 ```
 
@@ -364,6 +394,10 @@ When the user says something like "add to Apollo: always use bun" or "Apollo: ne
    - "never auto-commit" → `git.auto_commit: false`
    - "use pytest" → `stack.test_framework: pytest` + `testing.code.framework: pytest`
    - "conventional commits" → `git.commit_style: conventional`
+   - "api runs on port 3001" → `dev.services.api.port: 3001`
+   - "we use docker compose" → `dev.runtime: docker-compose`
+   - "start with docker compose up -d" → `dev.commands.start: "docker compose up -d"`
+   - "frontend on 5173" → `dev.services.frontend.port: 5173`
    - If the mapping isn't obvious, ask: "Which config key should I update?"
 
 2. **Ask scope**
@@ -421,6 +455,13 @@ This procedure is called by `/apollo init`, `/apollo check` (when drift detected
    | `docs.update_trigger` | "Update docs on: {trigger}" |
    | `release.versioning` | "Versioning: {scheme}" |
    | `secrets.warn_on_commit: true` | "Check for secrets before committing" |
+   | `dev.runtime` | "Dev runtime: {runtime}" |
+   | `dev.services` | "Services: {name} (:{port}), ..." — list all services with ports |
+   | `dev.commands.start` | "Start: `{command}`" |
+   | `dev.commands.stop` | "Stop: `{command}`" |
+   | `dev.commands.build` | "Build: `{command}`" |
+   | `dev.commands.test` | "Test: `{command}`" |
+   | `dev.commands.*` (other) | "{name}: `{command}`" — any custom command keys |
 
    Only include instructions for config values that are set and meaningful (skip nulls, empty arrays, false booleans that represent absence).
 

@@ -76,3 +76,23 @@ secrets:
   env_pattern: ".env*"          # Glob pattern for env files to gitignore
   extra_ignores: []             # Additional patterns to always gitignore
   warn_on_commit: true          # Warn if secrets might be staged
+
+# Local development environment (optional)
+# Tells agents how to build, run, and test the project locally
+dev:
+  runtime: local                # local | docker-compose | docker | podman
+  # services:                   # Map of service name to port/description
+  #   api:
+  #     port: 3001
+  #     description: Backend API
+  #   frontend:
+  #     port: 5173
+  #     description: Vite dev server
+  #   redis:
+  #     port: 6379
+  commands:
+    start: "npm start"          # How to start the project
+    # stop: ""                  # How to stop (relevant for containers)
+    build: "npm run build"      # How to build
+    test: "npm test"            # How to run tests
+    # logs: ""                  # How to view logs
