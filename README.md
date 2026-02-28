@@ -5,10 +5,27 @@ Agent-agnostic project lifecycle manager. Encodes your development preferences i
 ## Install
 
 ```bash
-# Claude Code
+# 1. Symlink the skill
 ln -s <path-to-apollo>/skills/apollo ~/.claude/skills/apollo
 
-# First run — Apollo walks you through setup
+# 2. Install session start hook (optional — auto-checks project health)
+mkdir -p ~/.claude/hooks/apollo
+cp <path-to-apollo>/hooks/session-start.sh ~/.claude/hooks/apollo/
+chmod +x ~/.claude/hooks/apollo/session-start.sh
+```
+
+Then add the hook to `~/.claude/settings.json` under `hooks.SessionStart`:
+
+```json
+{
+  "type": "command",
+  "command": "<absolute-path-to>/.claude/hooks/apollo/session-start.sh",
+  "timeout": 5
+}
+```
+
+```bash
+# 3. First run — Apollo walks you through setup
 /apollo config
 ```
 
