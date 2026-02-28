@@ -28,3 +28,6 @@ release:
   versioning: semver
   changelog: auto
   tag_on_release: true
+
+dev:
+  runtime: docker-compose
