@@ -1,6 +1,3 @@
-# Apollo user config (never commit personal preferences)
-.apollo.yaml
-
 # OS
 .DS_Store
 Thumbs.db

@@ -410,6 +410,10 @@ This procedure is called by `/apollo init`, `/apollo check` (when drift detected
    | `testing.code.run_before_commit: true` | "Run tests before every commit" |
    | `testing.product.tool: delphi` | "Product testing: use Delphi for {surfaces} surfaces" |
    | `workflow.design_before_code: true` | "Design before code: always run brainstorming/design phase first" |
+   | `workflow.design_entry_skill` | "Design entry: invoke {skill} skill for all design/brainstorm work" |
+   | `docs.quickstart: true` | "Maintain a Quick Start guide" |
+   | `docs.architecture: true` | "Maintain architecture documentation" |
+   | `docs.decisions: true` | "Track decisions in docs/decisions/" |
    | `workflow.review_before_merge: true` | "Code review required before merging" |
    | `docs.readme: true` | "Maintain README.md" |
    | `docs.changelog: true` | "Maintain CHANGELOG.md" |
