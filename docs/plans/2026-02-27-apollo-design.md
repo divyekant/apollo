@@ -72,6 +72,18 @@ oss:
   code_of_conduct: true
   issue_templates: true
 
+# Testing
+testing:
+  code:
+    approach: tdd               # tdd | test-after | none
+    framework: vitest           # vitest | jest | pytest | go-test | etc.
+    coverage_target: null       # e.g. 80 — null means no target
+    run_before_commit: true     # enforce tests pass before committing
+  product:
+    tool: delphi                # delphi | manual | none
+    surfaces: [ui, api, cli]    # which surfaces to test (ui | api | cli | background)
+    trigger: feature            # feature | release | manual — when to generate test cases
+
 # Skills / workflow
 workflow:
   design_before_code: true
@@ -128,9 +140,9 @@ Apollo writes a managed section into the project's agent instruction file:
 ## Project Conventions (managed by Apollo)
 - Language: TypeScript, package manager: bun
 - Commits: conventional style, never auto-commit
-- Run tests before every commit
+- Testing: TDD with vitest, run tests before every commit
+- Product testing: use Delphi for UI/API/CLI surfaces on new features
 - Design before code: always invoke brainstorming first
-- TDD: write tests before implementation
 - Docs: update README on every feature addition
 <!-- APOLLO:END -->
 ```
