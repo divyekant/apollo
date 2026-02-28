@@ -2,6 +2,12 @@
 
 ## Unreleased
 
+### Added
+- `dev:` section in config for local development environment (runtime, services/ports, commands)
+- Onboarding questions for dev environment setup
+- `/apollo check` validates dev environment (duplicate ports, compose file existence)
+- Natural language support for adding dev config ("we use docker compose", "api on 3001")
+
 ### Fixed
 - Session start hook now prints a one-liner status to the terminal (via stderr)
 

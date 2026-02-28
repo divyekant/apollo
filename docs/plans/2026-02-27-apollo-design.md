@@ -97,6 +97,18 @@ release:
   tag_on_release: true
   publish: false                # npm publish, pypi, etc.
 
+# Local development environment (optional)
+dev:
+  runtime: docker-compose       # local | docker-compose | docker | podman
+  services:
+    api:
+      port: 3001
+      description: Backend API
+  commands:
+    start: "docker compose up -d"
+    stop: "docker compose down"
+    test: "docker compose exec api npm test"
+
 # Secrets & env handling
 secrets:
   env_pattern: ".env*"
@@ -332,3 +344,4 @@ ln -s ~/Projects/apollo/skills/apollo ~/.claude/skills/apollo
 | Scope | Agent-agnostic, universal | Designed for all agents from day one. Claude Code adapter is first, others follow. |
 | Per-project tracking | User's choice | `.apollo.yaml` gitignored or committed — asked during init. |
 | Onboarding | Conversational | Q&A builds config. No manual YAML editing required. |
+| Dev section | Optional, flat structure | Not all projects have runtimes. Flat matches existing config pattern. |
